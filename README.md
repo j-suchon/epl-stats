@@ -1,2 +1,445 @@
 # epl-stats
 A  fbref web-scraping python script to deliver all of your English Premier League stats
+
+
+The general purpose of this project was to retrieve all relevant EPL data on a weekly basis.
+As of now the python script directs the data to individual csv files. I will update as I plan to write this data to a PostgreSQL db later on. Provided you change the directory, this code should work just fine for anyone looking to ingest EPL data.
+
+This pulls current data from fbref.com using BeautifulSoup and packages the files for usage labeled with the current matchweek. These stats are cumulative, unless otherwise noted. The data is organized with a straightforward and understandable schema. 
+
+I have set up a trigger to automatically run this script when all 10 matchweek games have been played using crontab on Mac.
+
+# Tables
+
+# Fixtures 
+(All previously played matches)
+<img width="955" alt="Screen Shot 2021-10-02 at 12 37 12 PM" src="https://user-images.githubusercontent.com/78511692/135729788-c57c3d58-8a20-472b-a1ea-39b072a58d3c.png">
+
+- Wk - Match Week
+- Day - Day of match
+- Date - Date of match
+- Time - Venue local time of match
+- Home - Home team
+- xG - Home expected goals
+- Score - Home score-Away score
+- xG.1 - Away expected goals
+- Away - Away team
+- Venue - Location of match
+- Referee - Head official of match
+
+# League Table (LT)
+(current EPL standings)
+<img width="1105" alt="Screen Shot 2021-10-02 at 1 06 40 PM" src="https://user-images.githubusercontent.com/78511692/135730488-15e1258a-5ab0-4571-a63a-ca8d67706f03.png">
+
+- Rk - Rank
+- Squad	- Team
+- MP	- Matches played
+- W	- Wins
+- D	- Draws
+- L	- Loses
+- GF	- Goals for
+- GA	- Goals against
+- GD	- Goald differential
+- Pts	- Total points
+- xG	- Expected goals
+- xGA	- Expected goals and assists
+- xGD	- Expected goal differential
+- xGD/90	- Expected goals per 90
+- Last 5	- Last 5 results
+- Attendance	
+- Top Team Scorer	- Top scorer
+- Goalkeeper - Starting goalkeeper
+
+# Teams
+(all current team stats)
+<img width="1187" alt="Screen Shot 2021-10-02 at 1 07 25 PM" src="https://user-images.githubusercontent.com/78511692/135730505-071be3d6-8f1f-42c1-ba6c-ffafa90ab48a.png">
+
+- squad	players_used
+- possession
+- games
+- games_starts
+- minutes	
+- goals
+- assists	
+- pens_made	
+- pens_att	
+- cards_yellow	
+- cards_red	
+- goals_per90	
+- assists_per90	
+- goals_assists_per90	
+- goals_pens_per90	
+- goals_assists_pens_per90	
+- xg	
+- npxg	
+- xa	
+- xg_per90	
+- xa_per90	
+- xg_xa_per90	
+- npxg_per90	
+- npxg_xa_per90	
+- games_gk	
+- games_starts_gk	
+- minutes_gk	
+- goals_against_gk	
+- goals_against_per90_gk	
+- shots_on_target_against	
+- saves	save_pct	
+- wins_gk	draws_gk	
+- losses_gk	clean_sheets	
+- clean_sheets_pct	
+- pens_att_gk	
+- pens_allowed	
+- pens_saved	
+- pens_missed_gk	
+- minutes_90s	
+- free_kick_goals_against_gk	
+- corner_kick_goals_against_gk	
+- own_goals_against_gk	
+- psxg_gk	
+- psnpxg_per_shot_on_target_against	
+- psxg_net_gk	
+- psxg_net_per90_gk	
+- passes_completed_launched_gk	
+- passes_launched_gk	
+- passes_pct_launched_gk	
+- passes_gk	passes_throws_gk	
+- pct_passes_launched_gk	
+- passes_length_avg_gk	
+- goal_kicks	
+- pct_goal_kicks_launched	
+- goal_kick_length_avg	
+- crosses_gk	
+- crosses_stopped_gk	
+- crosses_stopped_pct_gk	
+- def_actions_outside_pen_area_gk	
+- def_actions_outside_pen_area_per90_gk	
+- avg_distance_def_actions_gk	
+- shots_total	
+- shots_on_target	
+- shots_free_kicks	
+- shots_on_target_pct	
+- shots_total_per90	
+- shots_on_target_per90	
+- goals_per_shot	
+- goals_per_shot_on_target	
+- npxg_per_shot	
+- xg_net	
+- npxg_net	
+- passes_completed	
+- passes	
+- passes_pct	
+- passes_total_distance	
+- passes_progressive_distance	
+- passes_completed_short	
+- passes_short	
+- passes_pct_short	
+- passes_completed_medium	
+- passes_medium	
+- passes_pct_medium	
+- passes_completed_long	
+- passes_long	
+- passes_pct_long	
+- xa_net	
+- assisted_shots	
+- passes_into_final_third	
+- passes_into_penalty_area	
+- crosses_into_penalty_area	
+- progressive_passes	
+- passes_live	
+- passes_dead	
+- passes_free_kicks	
+- through_balls	
+- passes_pressure	
+- passes_switches	
+- crosses	corner_kicks	
+- corner_kicks_in	
+- corner_kicks_out	
+- corner_kicks_straight	
+- passes_ground	
+- passes_low	
+- passes_high	
+- passes_left_foot	
+- passes_right_foot	
+- passes_head	
+- throw_ins	
+- passes_other_body	
+- passes_offsides	
+- passes_oob	
+- passes_intercepted	
+- passes_blocked	
+- sca	sca_per90	
+- sca_passes_live	
+- sca_passes_dead	
+- sca_dribbles	
+- sca_shots	
+- sca_fouled	
+- sca_def	
+- gca	
+- gca_per90	
+- gca_passes_live	
+- gca_passes_dead	
+- gca_dribbles	
+- gca_shots	
+- gca_fouled	
+- gca_def	
+- tackles	
+- tackles_won	
+- tackles_def_3rd	
+- tackles_mid_3rd	
+- tackles_att_3rd	
+- dribble_tackles	
+- dribbles_vs	
+- dribble_tackles_pct	
+- dribbled_past	
+- pressures	
+- pressure_regains	
+- pressure_regain_pct	
+- pressures_def_3rd	
+- pressures_mid_3rd	
+- pressures_att_3rd	
+- blocks	
+- blocked_shots	
+- blocked_shots_saves	
+- blocked_passes	
+- interceptions	
+- clearances	
+- errors	
+- touches	
+- touches_def_pen_area	
+- touches_def_3rd	
+- touches_mid_3rd	
+- touches_att_3rd	
+- touches_att_pen_area	
+- touches_live_ball	
+- dribbles_completed	
+- dribbles	
+- dribbles_completed_pct	
+- players_dribbled_past	nutmegs	
+- carries	
+- carry_distance	
+- carry_progressive_distance	
+- progressive_carries	
+- carries_into_final_third	
+- carries_into_penalty_area	pass_targets	
+- passes_received	
+- passes_received_pct	
+- miscontrols	
+- dispossessed	
+- cards_yellow_red	
+- fouls	fouled	
+- offsides	
+- pens_won	
+- pens_conceded	
+- own_goals	
+- ball_recoveries	
+- aerials_won	
+- aerials_lost	
+- aerials_won_pct
+
+# Players 
+(all current player stats)
+<img width="1206" alt="Screen Shot 2021-10-02 at 1 08 12 PM" src="https://user-images.githubusercontent.com/78511692/135730523-eba7f5cb-de03-43b4-9d71-3d753038882f.png">
+
+
+- player	
+- nationality	
+- position	
+- squad	
+- age	
+- birth_year	
+- games	
+- games_starts	
+- minutes	
+- goals	
+- assists	
+- pens_made	
+- pens_att	
+- cards_yellow	
+- cards_red	goals_per90	
+- assists_per90	
+- goals_assists_per90	
+- goals_pens_per90	
+- goals_assists_pens_per90	
+- xg	
+- npxg	
+- xa	
+- xg_per90	
+- xa_per90	
+- xg_xa_per90	
+- npxg_per90	
+- npxg_xa_per90	
+- minutes_90s	
+- shots_total	
+- shots_on_target	
+- shots_free_kicks	
+- shots_on_target_pct	
+- shots_total_per90	
+- shots_on_target_per90	
+- goals_per_shot	
+- goals_per_shot_on_target	
+- npxg_per_shot	
+- xg_net	
+- npxg_net	
+- passes_completed	
+- passes	
+- passes_pct	
+- passes_total_distance	
+- passes_progressive_distance	
+- passes_completed_short	
+- passes_short	
+- passes_pct_short	
+- passes_completed_medium	
+- passes_medium	
+- passes_pct_medium	
+- passes_completed_long	
+- passes_long	
+- passes_pct_long	
+- xa_net	
+- assisted_shots	
+- passes_into_final_third	
+- passes_into_penalty_area	
+- crosses_into_penalty_area	
+- progressive_passes	
+- passes_live	passes_dead	
+- passes_free_kicks	
+- through_balls	
+- passes_pressure	
+- passes_switches	
+- crosses	
+- corner_kicks	
+- corner_kicks_in	
+- corner_kicks_out	
+- corner_kicks_straight	
+- passes_ground	
+- passes_low	
+- passes_high	passes_left_foot	
+- passes_right_foot	
+- passes_head	
+- throw_ins	
+- passes_other_body	
+- passes_offsides	
+- passes_oob	
+- passes_intercepted	
+- passes_blocked	
+- sca	sca_per90	
+- sca_passes_live	
+- sca_passes_dead	
+- sca_dribbles	
+- sca_shots	
+- sca_fouled	
+- sca_def	
+- gca	
+- gca_per90	
+- gca_passes_live	
+- gca_passes_dead	
+- gca_dribbles	
+- gca_shots	gca_fouled	
+- gca_def	
+- tackles	
+- tackles_won	
+- tackles_def_3rd	
+- tackles_mid_3rd	
+- tackles_att_3rd	
+- dribble_tackles	
+- dribbles_vs	
+- dribble_tackles_pct	
+- dribbled_past	
+- pressures	
+- pressure_regains	
+- pressure_regain_pct	
+- pressures_def_3rd	
+- pressures_mid_3rd	
+- pressures_att_3rd	
+- blocks	
+- blocked_shots	
+- blocked_shots_saves	
+- blocked_passes	
+- interceptions	
+- clearances	
+- errors	
+- touches	
+- touches_def_pen_area	
+- touches_def_3rd	
+- touches_mid_3rd	
+- touches_att_3rd	
+- touches_att_pen_area	
+- touches_live_ball	
+- dribbles_completed	
+- dribbles	
+- dribbles_completed_pct	
+- players_dribbled_past	
+- nutmegs	
+- carries	
+- carry_distance	
+- carry_progressive_distance	
+- progressive_carries	
+- carries_into_final_third	
+- carries_into_penalty_area	
+- pass_targets	
+- passes_received	
+- passes_received_pct	miscontrols	
+- dispossessed	
+- cards_yellow_red	
+- fouls	fouled	
+- offsides	
+- pens_won	
+- pens_conceded	own_goals	
+- ball_recoveries	
+- aerials_won	
+- aerials_lost	
+- aerials_won_pct
+
+# Keepers
+(All goalkeeping stats)
+
+<img width="1181" alt="Screen Shot 2021-10-02 at 12 35 20 PM" src="https://user-images.githubusercontent.com/78511692/135729753-d52e90e6-c4c3-4304-b8ba-22acfdc4ed25.png">
+
+
+- player	
+- nationality	
+- position	
+- squad	
+- age	
+- birth_year	
+- games_gk	
+- games_starts_gk	
+- minutes_gk	
+- goals_against_gk	
+- goals_against_per90_gk	
+- shots_on_target_against	
+- saves	
+- save_pct	
+- wins_gk	
+- draws_gk	
+- losses_gk	
+- clean_sheets	
+- clean_sheets_pct	
+- pens_att_gk	
+- pens_allowed	
+- pens_saved	
+- pens_missed_gk	
+- minutes_90s	
+- free_kick_goals_against_gk	
+- corner_kick_goals_against_gk	
+- own_goals_against_gk	
+- psxg_gk	
+- psnpxg_per_shot_on_target_against	
+- psxg_net_gk	psxg_net_per90_gk	
+- passes_completed_launched_gk	
+- passes_launched_gk	
+- passes_pct_launched_gk	
+- passes_gk	
+- passes_throws_gk	
+- pct_passes_launched_gk	
+- passes_length_avg_gk	
+- goal_kicks	
+- pct_goal_kicks_launched	
+- goal_kick_length_avg	
+- crosses_gk	
+- crosses_stopped_gk	
+- crosses_stopped_pct_gk	
+- def_actions_outside_pen_area_gk	
+- def_actions_outside_pen_area_per90_gk	
+- avg_distance_def_actions_gk
+
