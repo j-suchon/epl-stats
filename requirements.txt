@@ -1,0 +1,7 @@
+BeautifulSoup==3.2.2
+beautifulsoup4==4.9.3   
+lxml==4.6.3 
+pandas==0.24.2  
+PuLP==2.1
+pyparsing==2.4.7.
+requests==2.25.1.
